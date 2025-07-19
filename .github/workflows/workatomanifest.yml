@@ -23,7 +23,7 @@ jobs:
 
       - name: Install Workato CLI
         run: |
-          npm install -g @workato/cli
+          npm install -g @workato/mcp-server
 
       - name: Authenticate Workato CLI
         run: |
