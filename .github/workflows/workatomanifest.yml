@@ -1,0 +1,42 @@
+name: Generate Workato Manifest
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  workflow_dispatch:
+
+jobs:
+  generate-manifest:
+    name: Generate Manifest File
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Workato CLI
+        run: |
+          npm install -g @workato/cli
+
+      - name: Authenticate Workato CLI
+        run: |
+          workato auth:login --api-key ${{ secrets.WORKATO_API_KEY }}
+
+      - name: Generate manifest file
+        run: |
+          workato project manifest generate
+
+      - name: Commit manifest file (if changed)
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add manifest.yml
+          git diff --cached --quiet || git commit -m "chore: auto-generate manifest.yml"
+          git push
